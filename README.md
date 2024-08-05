@@ -28,4 +28,8 @@ Fuzlex adopts clean architecture.
 But in this project, we don't need to use database, we don't have any repositories, gateways.
 
 Below is the entire Fuzlex system design overview.
+
+![スクリーンショット 2024-08-05 20 30 45](https://github.com/user-attachments/assets/07f96031-ef73-4f9f-84fb-e861c39b1a08)
+
+
  
