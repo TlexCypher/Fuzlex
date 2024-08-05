@@ -7,13 +7,13 @@ import (
 )
 
 type FzfUsecase interface {
-	Find(input FzfInputData) *FzfOutputData
+	Find(input FzfInputData)
 }
 
 type FzfInputData struct {
-	Filename      string
+	Glob          string
 	AlgorithmName string
-	Paths         []string
+	Files         []*os.File
 }
 
 type FzfOutputData struct {
@@ -23,12 +23,12 @@ type FzfOutputData struct {
 type FzfUsecaseInteractor struct{}
 
 func (i *FzfUsecaseInteractor) Find(input FzfInputData) {
-	algorithmFactory := factory.AlgorithmFactory{
-		AlgorithmName: input.AlgorithmName,
-	}
-	algorithm := algorithmFactory.CreateAlgorithm()
+	//algorithmFactory := factory.AlgorithmFactory{
+	//	AlgorithmName: input.AlgorithmName,
+	//}
+	//algorithm := algorithmFactory.CreateAlgorithm()
 	output := FzfOutputData{
-		Files: walkWithAlgo(algorithm),
+		Files: input.Files,
 	}
 	uiFactory := factory.UIFactory{
 		Files: output.Files,
