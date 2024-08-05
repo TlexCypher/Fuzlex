@@ -1,0 +1,24 @@
+@startuml
+class Controller
+class InputData<DS>
+Interface InputBoundary
+Interface OutputBoundary
+class OutputData<DS>
+class UsecaseInteractor
+class Entities
+class ViewModel<DS>
+class View
+class Presenter
+
+InputData <.. Controller
+InputBoundary <.. Controller
+ViewModel <.. Presenter
+ViewModel <.. View
+OutputBoundary <|.. Presenter
+OutputBoundary <.. UsecaseInteractor
+OutputData <.. UsecaseInteractor
+InputBoundary <|.. UsecaseInteractor
+InputData <.. UsecaseInteractor
+Entities <.. UsecaseInteractor
+OutputData<..ViewModel
+@enduml
