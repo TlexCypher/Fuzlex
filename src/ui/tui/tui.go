@@ -2,31 +2,29 @@ package tui
 
 import (
 	"Fuzlex/src/share"
-	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"log"
 	"os"
 	"path/filepath"
 )
 
 type TUI struct {
-	Files []*os.File
+	Dirs []*os.File
 }
 
 func (t *TUI) ShowDialog() {
-	base := tview.NewBox().
-		SetBorder(true).
-		SetTitle(share.APP_NAME)
-	fileTree := createFileTreeView(t.Files)
-	layout := createLayout(base, fileTree)
+	fileTree := createFileTreeView(t.Dirs)
+	previewPanel := createPreviewPanel()
+	layout := createLayout(fileTree, previewPanel)
 	dialog := tview.NewApplication()
 	pages := tview.NewPages()
 	pages.AddPage("main", layout, true, true)
 	dialog.SetRoot(pages, true).Run()
 }
 
-func createFileTreeView(files []*os.File) *tview.TreeView {
-	rootDir := files[0].Name()
+func createFileTreeView(dirs []*os.File) *tview.TreeView {
+	rootDir := dirs[0].Name()
 	root := tview.NewTreeNode(rootDir).
 		SetColor(tcell.ColorRed)
 
@@ -36,22 +34,6 @@ func createFileTreeView(files []*os.File) *tview.TreeView {
 
 	// A helper function which adds the files and directories of the given path
 	// to the given target node.
-	add := func(target *tview.TreeNode, path string) {
-		fmt.Println(path)
-		files, err := os.ReadDir(path)
-		if err != nil {
-			panic(err)
-		}
-		for _, file := range files {
-			node := tview.NewTreeNode(file.Name()).
-				SetReference(filepath.Join(path, file.Name())).
-				SetSelectable(file.IsDir())
-			if file.IsDir() {
-				node.SetColor(tcell.ColorGreen)
-			}
-			target.AddChild(node)
-		}
-	}
 
 	// Add the current directory to the root node.
 	add(root, rootDir)
@@ -72,15 +54,50 @@ func createFileTreeView(files []*os.File) *tview.TreeView {
 			node.SetExpanded(!node.IsExpanded())
 		}
 	})
+	tree.SetBorder(true)
 	return tree
 }
 
-func createLayout(base *tview.Box, fileTree *tview.TreeView) *tview.Flex {
+func createPreviewPanel() *tview.Box {
+	previewPanel := tview.NewBox().SetBorder(true).SetTitle("Preview")
+	return previewPanel
+}
+
+func add(target *tview.TreeNode, path string) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		//fileを開こうとした時はpreviewを見せたい
+		log.Printf("open the file, path: %v\n", path)
+		fc, err := os.ReadFile(path)
+		if err != nil {
+			log.Printf("Failed to open file: %v\n", path)
+			return
+		}
+		showPreview(fc)
+		return
+	}
+	for _, file := range files {
+		node := tview.NewTreeNode(file.Name()).
+			SetReference(filepath.Join(path, file.Name()))
+		if file.IsDir() {
+			node.SetColor(tcell.ColorGreen)
+		} else {
+			node.SetColor(tcell.ColorBlue)
+		}
+		target.AddChild(node)
+	}
+}
+
+func showPreview(fc []byte) {
+
+}
+
+func createLayout(fileTree *tview.TreeView, previewPanel *tview.Box) *tview.Flex {
 	bodyLayout := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(base, 20, 1, true).
-		AddItem(fileTree, 0, 1, false)
+		AddItem(fileTree, 0, 1, true).
+		AddItem(previewPanel, 0, 1, false)
 	header := tview.NewTextView()
-	header.SetBorder(true)
+	header.SetBorder(false)
 	header.SetText(share.APP_NAME)
 	header.SetTextAlign(tview.AlignCenter)
 

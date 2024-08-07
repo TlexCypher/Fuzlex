@@ -14,6 +14,6 @@ func (c *FzfController) Launch(algorithmName string, files []*os.File) {
 	c.FzfUsecase.Find(usecase.FzfInputData{
 		Glob:          share.ALL,
 		AlgorithmName: algorithmName,
-		Files:         files,
+		Dirs:          files,
 	})
 }

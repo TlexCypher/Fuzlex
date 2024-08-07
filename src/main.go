@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func main() {
@@ -37,9 +36,9 @@ func walkAll() []*os.File {
 			log.Fatalln("failed filepath.WalkDir")
 			return err
 		}
-		if info.IsDir() && !strings.Contains(path, ".git") {
-			fmt.Println(path)
+		if info.IsDir() {
 			f, err := os.Open(path)
+			fmt.Println(f.Name())
 			if err != nil {
 				log.Fatalf("Failed to open file: %v", f.Name())
 				return err
@@ -50,8 +49,5 @@ func walkAll() []*os.File {
 		return nil
 	})
 	log.Printf("Files length: %v\n", len(dirs))
-	for _, v := range dirs {
-		fmt.Println(v.Name())
-	}
 	return dirs
 }

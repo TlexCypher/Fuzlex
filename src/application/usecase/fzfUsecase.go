@@ -13,11 +13,11 @@ type FzfUsecase interface {
 type FzfInputData struct {
 	Glob          string
 	AlgorithmName string
-	Files         []*os.File
+	Dirs          []*os.File
 }
 
 type FzfOutputData struct {
-	Files []*os.File
+	Dirs []*os.File
 }
 
 type FzfUsecaseInteractor struct{}
@@ -28,10 +28,10 @@ func (i *FzfUsecaseInteractor) Find(input FzfInputData) {
 	//}
 	//algorithm := algorithmFactory.CreateAlgorithm()
 	output := FzfOutputData{
-		Files: input.Files,
+		Dirs: input.Dirs,
 	}
 	uiFactory := factory.UIFactory{
-		Files: output.Files,
+		Dirs: output.Dirs,
 	}
 	ui := uiFactory.CreateUI()
 	ui.ShowDialog()
