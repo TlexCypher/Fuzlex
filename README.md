@@ -9,7 +9,11 @@ But, **Fuzlex is a game changer**!
 Only you should do is to enter **fz** to open Fuzlex, choose the algorithm, enter the keyword, then absolutely can get anything you want!
 
 ## How's like?
-Coming soon...
+
+
+https://github.com/user-attachments/assets/3233aac6-058d-4a50-bbba-a02546bf286d
+
+
 
 ## Installation
 Coming soon...
