@@ -1,13 +1,15 @@
 package tui
 
 import (
-	"Fuzlex/src/share"
+	constants "Fuzlex/src/share/const"
+	"Fuzlex/src/share/logger"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"log"
 	"os"
 	"path/filepath"
 )
+
+var logging = logger.GetLogger()
 
 type TUI struct {
 	Dirs []*os.File
@@ -67,10 +69,10 @@ func add(target *tview.TreeNode, path string) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		//fileを開こうとした時はpreviewを見せたい
-		log.Printf("open the file, path: %v\n", path)
+		logging.Printf("open the file, path: %v\n", path)
 		fc, err := os.ReadFile(path)
 		if err != nil {
-			log.Printf("Failed to open file: %v\n", path)
+			logging.Printf("Failed to open file: %v\n", path)
 			return
 		}
 		showPreview(fc)
@@ -98,7 +100,7 @@ func createLayout(fileTree *tview.TreeView, previewPanel *tview.Box) *tview.Flex
 		AddItem(previewPanel, 0, 1, false)
 	header := tview.NewTextView()
 	header.SetBorder(false)
-	header.SetText(share.APP_NAME)
+	header.SetText(constants.APP_NAME)
 	header.SetTextAlign(tview.AlignCenter)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow).

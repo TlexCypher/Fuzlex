@@ -1,7 +1,7 @@
 package factory
 
 import (
-	"Fuzlex/src/share"
+	constants "Fuzlex/src/share/const"
 	"Fuzlex/src/ui"
 	"Fuzlex/src/ui/tui"
 	"os"
@@ -14,7 +14,7 @@ type UIFactory struct {
 
 func (u *UIFactory) CreateUI() ui.UI {
 	switch u.UI {
-	case share.TUI:
+	case constants.TUI:
 	default:
 		return &tui.TUI{Dirs: u.Dirs}
 	}

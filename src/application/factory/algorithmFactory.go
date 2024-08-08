@@ -2,7 +2,7 @@ package factory
 
 import (
 	"Fuzlex/src/domain"
-	"Fuzlex/src/share"
+	"Fuzlex/src/share/const"
 )
 
 type AlgorithmFactory struct {
@@ -11,7 +11,7 @@ type AlgorithmFactory struct {
 
 func (af *AlgorithmFactory) CreateAlgorithm() domain.Algorithm {
 	switch af.AlgorithmName {
-	case share.COMP_MATCH:
+	case constants.COMP_MATCH:
 	default:
 		return &domain.CompMatchAlgo{}
 	}

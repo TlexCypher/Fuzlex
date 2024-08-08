@@ -3,14 +3,17 @@ package main
 import (
 	"Fuzlex/src/adapter/controllers"
 	"Fuzlex/src/application/usecase"
-	"fmt"
+	"Fuzlex/src/share/logger"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 )
 
+var logging *log.Logger
+
 func main() {
+	logging = logger.GetLogger()
 	algorithmName := parseArgs()
 	fzfController := controllers.FzfController{FzfUsecase: &usecase.FzfUsecaseInteractor{}}
 	fzfController.Launch(algorithmName, walkAll())
@@ -18,9 +21,9 @@ func main() {
 
 func parseArgs() string {
 	if len(os.Args) < 2 {
-		log.Printf("Invalid arguments.\n")
-		log.Printf("  Options\n: -c: Complete Match\n-f Fuzzy Match\n")
-		log.Fatalln("Default is Complete Match.")
+		logging.Printf("Invalid arguments.\n")
+		logging.Printf("  Options\n: -c: Complete Match\n-f Fuzzy Match\n")
+		logging.Fatalln("Default is Complete Match.")
 	}
 	return os.Args[1]
 }
@@ -28,19 +31,18 @@ func parseArgs() string {
 func walkAll() []*os.File {
 	here, err := os.Getwd()
 	if err != nil {
-		log.Fatalln("Failed to get current working directory.")
+		logging.Fatalln("Failed to get current working directory.")
 	}
 	dirs := make([]*os.File, 0)
 	filepath.WalkDir(here, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			log.Fatalln("failed filepath.WalkDir")
+			logging.Fatalln("failed filepath.WalkDir")
 			return err
 		}
 		if info.IsDir() {
 			f, err := os.Open(path)
-			fmt.Println(f.Name())
 			if err != nil {
-				log.Fatalf("Failed to open file: %v", f.Name())
+				logging.Fatalf("Failed to open file: %v", f.Name())
 				return err
 			}
 			dirs = append(dirs, f)
@@ -48,6 +50,6 @@ func walkAll() []*os.File {
 		}
 		return nil
 	})
-	log.Printf("Files length: %v\n", len(dirs))
+	logging.Printf("Files length: %v\n", len(dirs))
 	return dirs
 }

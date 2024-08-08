@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"Fuzlex/src/application/usecase"
-	"Fuzlex/src/share"
+	"Fuzlex/src/share/const"
 	"os"
 )
 
@@ -12,7 +12,7 @@ type FzfController struct {
 
 func (c *FzfController) Launch(algorithmName string, files []*os.File) {
 	c.FzfUsecase.Find(usecase.FzfInputData{
-		Glob:          share.ALL,
+		Glob:          constants.ALL,
 		AlgorithmName: algorithmName,
 		Dirs:          files,
 	})
