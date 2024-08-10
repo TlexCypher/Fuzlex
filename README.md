@@ -11,7 +11,11 @@ Only you should do is to enter **fz** to open Fuzlex, choose the algorithm, ente
 ## How's like?
 
 
-https://github.com/user-attachments/assets/3233aac6-058d-4a50-bbba-a02546bf286d
+
+https://github.com/user-attachments/assets/8a15fd8e-d9fc-43f7-9c82-264a217c2e16
+
+
+
 
 
 
