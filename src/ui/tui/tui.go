@@ -12,20 +12,22 @@ import (
 var logging = logger.GetLogger()
 
 type TUI struct {
-	Dirs []*os.File
+	Dirs         []*os.File
+	FileTree     *tview.TreeView
+	PreviewPanel *tview.TextView
 }
 
 func (t *TUI) ShowDialog() {
-	fileTree := createFileTreeView(t.Dirs)
-	previewPanel := createPreviewPanel()
-	layout := createLayout(fileTree, previewPanel)
+	t.FileTree = t.createFileTreeView(t.Dirs)
+	t.PreviewPanel = createPreviewPanel()
+	layout := createLayout(t.FileTree, t.PreviewPanel)
 	dialog := tview.NewApplication()
 	pages := tview.NewPages()
 	pages.AddPage("main", layout, true, true)
 	dialog.SetRoot(pages, true).Run()
 }
 
-func createFileTreeView(dirs []*os.File) *tview.TreeView {
+func (t *TUI) createFileTreeView(dirs []*os.File) *tview.TreeView {
 	rootDir := dirs[0].Name()
 	root := tview.NewTreeNode(rootDir).
 		SetColor(tcell.ColorRed)
@@ -38,7 +40,7 @@ func createFileTreeView(dirs []*os.File) *tview.TreeView {
 	// to the given target node.
 
 	// Add the current directory to the root node.
-	add(root, rootDir)
+	t.add(root, rootDir)
 
 	// If a directory was selected, open it.
 	tree.SetSelectedFunc(func(node *tview.TreeNode) {
@@ -50,7 +52,7 @@ func createFileTreeView(dirs []*os.File) *tview.TreeView {
 		if len(children) == 0 {
 			// Load and show files in this directory.
 			path := reference.(string)
-			add(node, path)
+			t.add(node, path)
 		} else {
 			// Collapse if visible, expand if collapsed.
 			node.SetExpanded(!node.IsExpanded())
@@ -60,12 +62,13 @@ func createFileTreeView(dirs []*os.File) *tview.TreeView {
 	return tree
 }
 
-func createPreviewPanel() *tview.Box {
-	previewPanel := tview.NewBox().SetBorder(true).SetTitle("Preview")
+func createPreviewPanel() *tview.TextView {
+	previewPanel := tview.NewTextView()
+	previewPanel.SetBorder(true).SetTitle("Preview")
 	return previewPanel
 }
 
-func add(target *tview.TreeNode, path string) {
+func (t *TUI) add(target *tview.TreeNode, path string) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		//fileを開こうとした時はpreviewを見せたい
@@ -75,7 +78,7 @@ func add(target *tview.TreeNode, path string) {
 			logging.Printf("Failed to open file: %v\n", path)
 			return
 		}
-		showPreview(fc)
+		t.showPreview(fc)
 		return
 	}
 	for _, file := range files {
@@ -90,11 +93,11 @@ func add(target *tview.TreeNode, path string) {
 	}
 }
 
-func showPreview(fc []byte) {
-
+func (t *TUI) showPreview(fc []byte) {
+	t.PreviewPanel.SetText(string(fc))
 }
 
-func createLayout(fileTree *tview.TreeView, previewPanel *tview.Box) *tview.Flex {
+func createLayout(fileTree *tview.TreeView, previewPanel *tview.TextView) *tview.Flex {
 	bodyLayout := tview.NewFlex().SetDirection(tview.FlexColumn).
 		AddItem(fileTree, 0, 1, true).
 		AddItem(previewPanel, 0, 1, false)
