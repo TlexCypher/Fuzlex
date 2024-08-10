@@ -3,6 +3,11 @@ package tui
 import (
 	constants "Fuzlex/src/share/const"
 	"Fuzlex/src/share/logger"
+	"bytes"
+	"github.com/alecthomas/chroma/v2"
+	"github.com/alecthomas/chroma/v2/formatters"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"os"
@@ -78,7 +83,7 @@ func (t *TUI) add(target *tview.TreeNode, path string) {
 			logging.Printf("Failed to open file: %v\n", path)
 			return
 		}
-		t.showPreview(fc)
+		t.showPreview(fc, path)
 		return
 	}
 	for _, file := range files {
@@ -93,8 +98,50 @@ func (t *TUI) add(target *tview.TreeNode, path string) {
 	}
 }
 
-func (t *TUI) showPreview(fc []byte) {
-	t.PreviewPanel.SetText(string(fc))
+func (t *TUI) showPreview(fc []byte, path string) {
+	ext := filepath.Ext(path)
+	lx := getLexers(fc, ext)
+	f := getFormatter()
+	style := getStyle()
+	it, err := lx.Tokenise(nil, string(fc))
+	if err != nil {
+		logging.Fatalf("Failed to tokenize: %v\n.", path)
+	}
+
+	var buf bytes.Buffer
+	if err := f.Format(&buf, style, it); err != nil {
+		logging.Fatalf("Failed to format: %v\n", err)
+	}
+	t.PreviewPanel.SetDynamicColors(true)
+	t.PreviewPanel.SetText(tview.TranslateANSI(buf.String()))
+}
+
+func getLexers(fc []byte, ext string) chroma.Lexer {
+	l := lexers.Get(ext)
+	if l == nil {
+		l = lexers.Analyse(string(fc))
+	}
+	if l == nil {
+		l = lexers.Fallback
+	}
+	l = chroma.Coalesce(l)
+	return l
+}
+
+func getFormatter() chroma.Formatter {
+	f := formatters.Get("terminal256")
+	if f == nil {
+		f = formatters.Fallback
+	}
+	return f
+}
+
+func getStyle() *chroma.Style {
+	s := styles.Get("tokyonight-night")
+	if s == nil {
+		s = styles.Fallback
+	}
+	return s
 }
 
 func createLayout(fileTree *tview.TreeView, previewPanel *tview.TextView) *tview.Flex {
