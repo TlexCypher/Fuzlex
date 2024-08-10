@@ -48,7 +48,7 @@ func (t *TUI) createFileTreeView(dirs []*os.File) *tview.TreeView {
 	t.add(root, rootDir)
 
 	// If a directory was selected, open it.
-	tree.SetSelectedFunc(func(node *tview.TreeNode) {
+	tree.SetChangedFunc(func(node *tview.TreeNode) {
 		reference := node.GetReference()
 		if reference == nil {
 			return // Selecting the root node does nothing.
@@ -58,7 +58,16 @@ func (t *TUI) createFileTreeView(dirs []*os.File) *tview.TreeView {
 			// Load and show files in this directory.
 			path := reference.(string)
 			t.add(node, path)
-		} else {
+		}
+	})
+
+	tree.SetSelectedFunc(func(node *tview.TreeNode) {
+		reference := node.GetReference()
+		if reference == nil {
+			return // Selecting the root node does nothing.
+		}
+		children := node.GetChildren()
+		if len(children) != 0 {
 			// Collapse if visible, expand if collapsed.
 			node.SetExpanded(!node.IsExpanded())
 		}
@@ -94,6 +103,7 @@ func (t *TUI) add(target *tview.TreeNode, path string) {
 		} else {
 			node.SetColor(tcell.ColorBlue)
 		}
+		node.SetExpanded(false)
 		target.AddChild(node)
 	}
 }
@@ -147,7 +157,7 @@ func getStyle() *chroma.Style {
 func createLayout(fileTree *tview.TreeView, previewPanel *tview.TextView) *tview.Flex {
 	bodyLayout := tview.NewFlex().SetDirection(tview.FlexColumn).
 		AddItem(fileTree, 0, 1, true).
-		AddItem(previewPanel, 0, 1, false)
+		AddItem(previewPanel, 0, 3, false)
 	header := tview.NewTextView()
 	header.SetBorder(false)
 	header.SetText(constants.APP_NAME)
